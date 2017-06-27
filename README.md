@@ -17,3 +17,5 @@ inside my bag whilst standing beside....  clients - it was fun. The code
 Contains lines that blink a RGB LED attached to my RPi in order to
 indicate what it's doing.
 
+Note that the script is still being developed.
+
