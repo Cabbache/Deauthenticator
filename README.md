@@ -9,10 +9,10 @@ sent to all MAC addresses on that channel in multiple threads.
 
 ### Installation ####
 This should be executed on linux with python and Aircrack-ng installed.
-It also makes use of screen. To execute on linux --->> python jam.py arg1 arg2
+It also makes use of screen. To execute on linux --->> **python jam.py arg1 arg2**
 where arg1 is either 0 or 1, 1 to use GPIO LED and 0 to use nothing. arg2 is the
-monitor interface that is active when airmon-ng start 'interface' is executed.
-Example: python jam.py 0 wlan0mon
+monitor interface that is active when **airmon-ng start 'interface'** is executed.
+Example: **python jam.py 0 wlan0mon**
 
 ### Further Information ###
 This was tested on my Raspberry pi 2B  raspbian wheezy running on battries
