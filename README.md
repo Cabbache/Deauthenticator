@@ -9,7 +9,7 @@ sent to all MAC addresses on that channel in multiple threads.
 
 ### Installation ####
 This should be executed on linux with python and Aircrack-ng installed.
-It also makes use of screen. To execute on linux --->> **python jam.py*
+It also makes use of screen. To execute on linux --->> **python jam.py**
 
 ### Further Information ###
 This was tested on kali linux on a laptop PC and on Raspberry pi 2B with raspbian wheezy OS 
