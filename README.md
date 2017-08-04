@@ -13,7 +13,7 @@ It also makes use of screen. To execute on linux --->> **python jam.py**
 
 ### Further Information ###
 This was tested on kali linux on a laptop PC and on Raspberry pi 2B with raspbian wheezy OS 
-running on battries. The code Contains lines that blink a RGB LED attached to a RPi in order
+running on battries. The code Contains lines that blink a RGB LED attached to the RPi in order
 to indicate what it's doing.
 
 Note that the script is still being developed.
