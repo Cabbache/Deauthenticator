@@ -3,7 +3,7 @@ This python script will bring wifi networks around you to a halt.
 
 ### About ###
 **jam.py** does not need to authenticate with any AP in order to DOS the clients and the AP.
-It scans for MAC adresses, then checks which AP has the most clients so it switches the interface
+It scans for MAC adresses, then it checks which AP has the most clients so it switches the interface
 channel to that of the AP and scans again on that channel. Deauthentication packets are then
 sent to all MAC addresses on that channel in multiple threads.
 
